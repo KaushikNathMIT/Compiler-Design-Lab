@@ -22,7 +22,9 @@ int main(){
         char temp[50];
         if(!fgets(temp, 50, fp)) break;
         if(!temp) break;
-        if(temp[0] != '#'){
+        int i=0;
+        while(temp[i]==" ") i++;
+        if(temp[i] != '#'){
             fputs(temp, fp2);
         }
     }
