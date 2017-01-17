@@ -14,10 +14,7 @@ int main(){
         printf("Error Occured: Error while opening the input file.\n");
         exit(0);
     }
-    if (fp2 == NULL) {
-        printf("Error Occured: Error while opening the output file.\n");
-        exit(0);
-    }
+    
     char keyWords[32][10] = {"auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto", "if", "int", "long", "register", "return", "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
     while (1) {
         char temp[100];
