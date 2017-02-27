@@ -61,7 +61,7 @@ void checkSymbolTable(char* word) {
 				ste[i].nArg++;
 				addArg(i, word);
 				break;
-			} 
+			}
 		}
 	}
 	for(int i=0;i<8;i++){
@@ -112,16 +112,13 @@ int isSpecialOrOperator(char c){
 }
 
 
-
-
-
 char* getNextWord(FILE *fp){
 	//printf("Here now\n");
 	char c = fgetc(fp);
 	if(c == EOF) return "EOF!";
 	//printf("\nHere here %c\n", c);
 	if(c == '"') {
-		printf("%c", c);
+        printf("%c", c);
         c=fgetc(fp);
         while(c!='"') {
             printf("%c", c);
@@ -130,8 +127,7 @@ char* getNextWord(FILE *fp){
         printf("%c", c);
         c = fgetc(fp);
 	}
-	if(c == '\'') {
-		printf("%c", c);
+	else if(c == '\'') {
         c=fgetc(fp);
         while(c!='\'') {
             printf("%c", c);
@@ -139,28 +135,6 @@ char* getNextWord(FILE *fp){
         }
         printf("%c", c);
         c = fgetc(fp);
-	}
-	while(isSpecialOrOperator(c) && c!=EOF){
-        if(c == '{') nopb++;
-        else if(c=='}') nopb--;
-		if(c == '(') {
-			nopb2++;
-			
-			if(nowArg==0) {
-				if(!strcmp(lastKeyWord,"while")==0 && !strcmp(lastKeyWord,"for")==0 && !strcmp(lastKeyWord,"do")==0 && strcmp(lastKeyWord,"return")!=0) {
-					strcpy(ste[steSize-1].returnType, ste[steSize-1].type);
-					strcpy(ste[steSize-1].type, "FUNC");
-				}
-				
-				nowArg=1;
-			}
-		}
-        else if(c==')') {
-        	nopb2--;
-        	nowArg=0;
-        }
-		printf("<%c>", c);
-		c=fgetc(fp);
 	}
 	//printf("\nHere here\n");
 	if(c == EOF) return "EOF!";
@@ -172,56 +146,12 @@ char* getNextWord(FILE *fp){
             c=fgetc(fp);
         }
         word[i] = '\0';
-        if(isKeyword(word)) {
-            printf("<%s>", word);
-        }
-        else {
-            //printf("%s", word);
-            checkSymbolTable(word);
-        }
+        fseek(fp,-1,SEEK_CUR);
 	}
-	if(c == '"') {
-		printf("%c", c);
-        c=fgetc(fp);
-        while(c!='"') {
-            printf("%c", c);
-            c = fgetc(fp);
-        }
-        printf("%c", c);
-        c = fgetc(fp);
+	else {
+        word[0]=c;
+        word[1]='\0';
 	}
-	if(c == '\'') {
-		printf("%c", c);
-        c=fgetc(fp);
-        while(c!='\'') {
-            printf("%c", c);
-            c = fgetc(fp);
-        }
-        printf("%c", c);
-        c = fgetc(fp);
-	}
-	if(isSpecialOrOperator(c) && c!=EOF){
-	    if(c == '{') nopb++;
-        else if(c=='}') nopb--;
-		if(c == '(') {
-			nopb2++;
-			if(nowArg==0) {
-				if(!strcmp(lastKeyWord,"while")==0 && !strcmp(lastKeyWord,"for")==0 && !strcmp(lastKeyWord,"do")==0 && strcmp(lastKeyWord,"return")!=0) {
-					strcpy(ste[steSize-1].returnType, ste[steSize-1].type);
-					strcpy(ste[steSize-1].type, "FUNC");
-				}
-				
-				nowArg=1;
-			}
-		}
-        else if(c==')') {
-        	nopb2--;
-        	nowArg=0;
-        }
-		printf("<%c>", c);
-	}
-    else if(!isSpecialOrOperator(c)) printf("%c", c);
-    else return "EOF!";
     return word;
 }
 
@@ -230,11 +160,7 @@ int main(){
     FILE *fp, *fp2;
     printf("Enter the input file name \n");
     scanf("%s", fileName);
-    //printf("Enter the output file name");
-    //scanf("%s", fileName2);
     fp = fopen(fileName, "r");
-    //fp2 = fopen(fileName2, "w");
-
     if (fp == NULL) {
         printf("Error Occured: Error while opening the input file.\n");
         exit(0);
@@ -247,10 +173,37 @@ int main(){
         if(strcmp(word, "EOF!") == 0){
         	break;
         }
+        if(!isKeyword(word) && !isSpecialOrOperator(word[0]) && isAlpha(word[0])) {
+            printf("<%s>", word);
+            checkSymbolTable(word);
+        }
+        else if(isSpecialOrOperator(word[0])) {
+            char c =word[0];
+            if(isSpecialOrOperator(c)) {
+                if(c == '{') nopb++;
+                else if(c=='}') nopb--;
+                if(c == '(') {
+                    nopb2++;
+                    if(nowArg==0) {
+                        if(!strcmp(lastKeyWord,"while")==0 && !strcmp(lastKeyWord,"for")==0 && !strcmp(lastKeyWord,"do")==0 && strcmp(lastKeyWord,"return")!=0) {
+                            strcpy(ste[steSize-1].returnType, ste[steSize-1].type);
+                            strcpy(ste[steSize-1].type, "FUNC");
+                        }
+                        nowArg=1;
+                    }
+                }
+                else if(c==')') {
+                    nopb2--;
+                    nowArg=0;
+                }
+                printf("<%c>", c);
+            }
+            else if(!isAlpha(c)) printf("%c", c);
+        }
+        else printf("%s", word);
     }
     fclose(fp);
     //fclose(fp2);
-    printf("Index\tName\tType\tScope\tnArg\tRetType\tSize\tArguments");
     printSymbolTable();
     return 0;
 }
