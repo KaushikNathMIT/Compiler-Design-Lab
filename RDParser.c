@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "LexicalAnalyzer.h"
+#include "LexicalAnalyzer2.h"
 
 FILE *fp;
 char* token;
@@ -69,8 +69,8 @@ int dataType() {
 int identifierList() {
         token = getNextWord(fp);
         char* temp = token;
-        if(strcmp(token, "id") == 0) {
-                printf("\nParsed id");
+        if(isIdentifier(token)==1) {
+                printf("\nParsed %s", token);
                 token = getNextWord(fp);
                 if(strcmp(token, ",")==0) {
                         printf("\nParsed ,");
@@ -86,13 +86,13 @@ int identifierList() {
 int assignStat() {
         token = getNextWord(fp);
         char* temp = token;
-        if(strcmp(token, "id")==0) {
+        if(isIdentifier(token)==1) {
                 printf("\nParsed %s", token);
                 token = getNextWord(fp);
                 if(strcmp(token, "=")==0) {
                         printf("\nParsed %s", token);
                         token = getNextWord(fp);
-                        if(strcmp(token,"id") == 0 || strcmp(token, "num")==0) {
+                        if(isIdentifier(token)==1 || isSNum(token)==1) {
                                 printf("\nParsed %s", token);
                                 return 1;
                         }
@@ -107,7 +107,9 @@ int main() {
         printf("Enter the file Name\n");
         scanf("%s", fileName);
         fp = fopen(fileName, "r");
+        LexicalAnalyzer(fp);
+        fp = fopen(fileName, "r");
         if(Program() == 1) printf("\nString possible by grammar");
         else printf("\nString not present in grammar");
-
+	return 0;
 }
