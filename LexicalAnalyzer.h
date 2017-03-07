@@ -26,11 +26,24 @@ char operators[9] = {'=', '!', '>', '<', '+', '-', '%', '/', '^'};
 char types[8][10] = {"int",  "char", "double", "float",
                      "long", "void", "struct", "FILE"};
 
+int isIdentifier(char* token) {
+	for(int i=0;i<steSize; i++) {
+		if(strcmp(token, ste[i].name)==0) return 1;
+	}
+}
+
 int isNum(char c) {
         if (c >= '0' && c <= '9') {
                 return 1;
         }
         return 0;
+}
+
+int isSNum(char* token) {
+	for(int i=0;token[i]!='\0';i++) {
+		if(!isNum(token[i])) return 0;
+	}
+	return 1;
 }
 
 int isAlpha(char c) {
@@ -158,7 +171,15 @@ char *getNextWord(FILE *fp) {
         if (c == EOF)
                 return "EOF!";
         char *word = malloc(30 * sizeof(char));
-        if (isAlpha(c)) {
+        if(isNum(c)) {
+        	int i=0;
+        	while(isNum(c)) {
+        		word[i++]=c;
+        		c=fgetc(fp);
+        	}
+        	fseek(fp, -1, SEEK_CUR);
+        }
+        else if (isAlpha(c)) {
                 int i = 0;
                 while (isAlpha(c) || isNum(c)) {
                         word[i++] = c;
@@ -170,15 +191,11 @@ char *getNextWord(FILE *fp) {
                 word[0] = c;
                 word[1] = '\0';
         }
-        return word;
+        if(strcmp(word,"\n")==0 || strcmp(word,"\t")==0) return getNextWord(fp);
+        else return word;
 }
 
-void LexicalAnalyzer() {
-        char fileName[20], fileName2[20];
-        FILE *fp, *fp2;
-        printf("Enter the input file name \n");
-        scanf("%s", fileName);
-        fp = fopen(fileName, "r");
+void LexicalAnalyzer(FILE* fp) {
         if (fp == NULL) {
                 printf("Error Occured: Error while opening the input file.\n");
                 exit(0);
@@ -223,7 +240,5 @@ void LexicalAnalyzer() {
                         printf("%s", word);
         }
         fclose(fp);
-        // fclose(fp2);
         printSymbolTable();
-        return 0;
 }
