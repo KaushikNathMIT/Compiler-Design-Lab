@@ -216,7 +216,7 @@ int factor() {
 
 int relop() {
         char* temp = getNextWord(fp);
-        if(strcmp(temp, "==")==0) {
+        if(strcmp(temp, "=")==0) {
                 printf("\nParsed %s", temp);
                 char* temp1 = getNextWord(fp);
                 if(strcmp(temp1,"=")==0) {
