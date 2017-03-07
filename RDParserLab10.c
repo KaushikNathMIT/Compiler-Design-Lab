@@ -128,7 +128,7 @@ int loopingStat() {
                 }
         }
         fseek(fp, tpos, SEEK_SET);
-
+        token = getNextWord(fp);
         if (strcmp(token, "for")==0) {
                 printf("\nParsed %s", token);
                 token = getNextWord(fp);
